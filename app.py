@@ -2,13 +2,20 @@ from dash import dash, html, dcc, html
 import dash_ag_grid as dag
 import pandas as pd
 from dash.dependencies import Input, Output
+import plotly.express as px
+import GraphsSetup as gs
 
+# ------------------- PLotly Figures and Data -------------------- #
 
-# Incorporate data
-df = pd.read_excel(r"D:\_University\Fall 2025\games_excel.xlsx") # Change this based on who is running the code
+Fig1 = gs.genre_popularity_fig
 
-
-
+Fig1.update_layout(
+    plot_bgcolor='#f9f9f9',  # Set a light background color for the plot area
+    paper_bgcolor='white', # Set background for the entire figure
+    font_family="Poppins",
+    title={'x':0.5} # Center the title
+)
+# ------------------- DASH APP SETUP -------------------- #
 external_stylesheets = [
     {
         "href": "https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap",
@@ -35,28 +42,31 @@ layout_home = html.Main(
                         html.H2("Active Players Over Time", className="card-title"),
                         html.P("(line chart)", className="card-subtitle"),
                     ]),
-                    html.Div("Line Chart Placeholder", className="placeholder-content"),
+                    html.Div(className="actual-content", children=[
+                        dcc.Graph(figure=Fig1)
+                    ]),
+                    # html.Div("Line Chart Placeholder", className="placeholder-content"), # ======== Insert Chart Here =========
                 ]),
                 html.Div(className="card", children=[
                     html.Div(className="card-header", children=[
                         html.H2("Active Players Per Genre", className="card-title"),
                         html.P("(bar chart)", className="card-subtitle"),
                     ]),
-                    html.Div("Bar Chart Placeholder", className="placeholder-content"),
+                    html.Div("Bar Chart Placeholder", className="placeholder-content"), # ======== Insert Chart Here =========
                 ]),
                 html.Div(className="card", children=[
                     html.Div(className="card-header", children=[
                         html.H2("Genre Explore", className="card-title"),
                         html.P("(bubble chart)", className="card-subtitle"),
                     ]),
-                    html.Div("Bubble Chart Placeholder", className="placeholder-content"),
+                    html.Div("Bubble Chart Placeholder", className="placeholder-content"), # ======== Insert Chart Here =========
                 ]),
                 html.Div(className="card", children=[
                     html.Div(className="card-header", children=[
                         html.H2("Top Performing Tags", className="card-title"),
                         html.P("(word cloud)", className="card-subtitle"),
                     ]),
-                    html.Div("Word Cloud Placeholder", className="placeholder-content"),
+                    html.Div("Word Cloud Placeholder", className="placeholder-content"), # ======== Insert Chart Here =========
                 ]),
             ],
         ),
