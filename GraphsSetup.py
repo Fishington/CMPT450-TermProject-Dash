@@ -5,8 +5,8 @@ import plotly.io as pio
 from wordcloud import WordCloud
 
 # Incorporate data
-df = pd.read_excel(r"D:\_University\Fall 2025\games_excel.xlsx") # Change this based on who is running the code
-#df = pd.read_csv('cleaned_games.csv', index_col=False)
+# df = pd.read_excel(r"D:\_University\Fall 2025\cleaned_games.csv") # Change this based on who is running the code
+df = pd.read_csv('cleaned_games.csv', index_col=False)
 
 # Style Setup
 
@@ -176,3 +176,61 @@ wc = WordCloud(
 wc_fig = px.imshow(wc, aspect="auto")
 wc_fig.update_layout(xaxis_title='', yaxis_title='', xaxis=dict(visible=False), yaxis=dict(visible=False))
 
+df_handled['Clickable_Info'] = df_handled['Name'] + "___" + df_handled['AppID'].astype(str)
+
+scatterplot_fig = px.scatter(
+    df_handled,
+    x='Average playtime forever',
+    y='Positive Review %',
+    hover_name='Clickable_Info',
+    title='Average Playtime vs Positive Review % (Click a point)',
+    size_max=60,
+    # custom_data=['AppID'],
+    hover_data={'AppID': True},
+    render_mode='webgl'
+)
+
+# Detail Page Function
+def get_game_data(game_id):
+    """
+    Takes a game_id (int or str), finds the matching row in the global df,
+    and returns a DataFrame containing the single row.
+    Returns None if no game is found.
+    """
+    try:
+        # 1. Ensure ID is an integer for comparison
+        target_id = int(game_id)
+    except (ValueError, TypeError):
+        print(f"Invalid Game ID format: {game_id}")
+        return None
+
+    
+    # We use .copy() to avoid SettingWithCopy warnings if we modify it later
+    game_row = df[df['AppID'] == target_id].copy()
+
+    if game_row.empty:
+        print(f"Game ID {target_id} not found in dataset.")
+        return None
+
+    
+    # If your CSV is missing 'Header image', we add a placeholder
+    # if 'Header image' not in game_row.columns:
+    #     game_row['Header image'] = ""
+
+    # Release Date
+    if 'Release Date' not in game_row.columns:
+        game_row['Release Date'] = "N/A"
+    
+    # If 'About the game' (description) is missing
+    if 'About the game' not in game_row.columns:
+        game_row['About the game'] = "No description available for this title."
+
+    # Format Price 
+    if 'Price' in game_row.columns:
+        # formatting as currency string for display
+        val = game_row['Price'].values[0]
+        game_row['Price_Formatted'] = "Free" if val == 0 else f"${val:.2f}"
+    else:
+        game_row['Price_Formatted'] = "N/A"
+
+    return game_row

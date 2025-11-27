@@ -13,6 +13,7 @@ Fig1 = gs.genre_popularity_fig
 Fig2 = gs.active_players_fig
 Fig3 = gs.bubble_fig
 Fig4 = gs.wc_fig
+Fig5 = gs.scatterplot_fig
 
 
 # ------------------- DASH APP SETUP -------------------- #
@@ -120,13 +121,8 @@ layout_home = html.Main(
                 ]),
                 # Main chart area
                 html.Div(className="card main-chart", children=[
-                    html.Div(className="placeholder-content", children=[
-                        "Main Scatter Plot Placeholder",
-                        html.Div(className="faux-tooltip", children=[
-                            html.Div("Game Name", className="name"),
-                            html.Div("Price", className="price"),
-                            html.Div("→", className="arrow"),
-                        ]),
+                    html.Div(className="actual-content", children=[
+                        dcc.Graph(figure=Fig5, id='main-scatter-plot', style={'height': '100%', 'width': '100%'})
                     ]),
                 ]),
             ],
@@ -136,103 +132,83 @@ layout_home = html.Main(
 
 
 # ---------------- LAYOUT FOR THE GAME DETAILS PAGE ---------------- #
-layout_detail = html.Main(
-    className="detail-page",
-    children=[
-        # Top Section
-        html.Section(
-            className="game-summary-section",
-            children=[
-                html.Div("Game Cover", className="game-cover"),
-                html.Div(
-                    className="game-info",
-                    children=[
-                        html.H1("Game Title"),
-                        html.P("$19.99", className="price"),
-                        html.P("Action, Adventure, Indie", className="genres"),
-                        html.P(
-                            "This is a placeholder description for the game. It provides a brief summary of the gameplay, story, and key features to give players an idea of what to expect.",
-                            className="description",
-                        ),
-                    ],
-                ),
-                html.Div(
-                    className="game-stats",
-                    children=[
-                        html.Div(className="stat-card", children=[html.Div("Achievements", className="label"), html.Div("42", className="value")]),
-                        html.Div(className="stat-card", children=[html.Div("Avg Playtime", className="label"), html.Div("86", className="value")]),
-                        html.Div(className="stat-card", children=[html.Div("Developer", className="label"), html.Div("DevCo", className="value")]),
-                        html.Div(className="stat-card", children=[html.Div("Positive Review %", className="label"), html.Div("92%", className="value")]),
-                        html.Div(className="stat-card", children=[html.Div("Publisher", className="label"), html.Div("PubStaging", className="value")]),
-                        html.Div(className="stat-card", children=[html.Div("Est. Owners", className="label"), html.Div("1.2M", className="value")]),
-                    ],
-                ),
-            ],
-        ),
-        # Bottom Section
-        html.Section(
-            className="bottom-section",
-            children=[
-                html.Div(
-                    className="card",
-                    children=[
-                        html.Div(className="card-header", children=[html.H2("Info Chart", className="card-title")]),
-                        html.Div("Info Chart Placeholder", className="placeholder-content"),
-                    ],
-                ),
-                html.Div(
-                    className="card",
-                    children=[
-                        html.Div(
-                            className="card-header",
-                            children=[
-                                html.H2("Comparison to Aspects of Popularity", className="card-title"),
-                                html.P("(radar chart)", className="card-subtitle"),
-                            ],
-                        ),
-                        html.Div("Radar Chart Placeholder", className="placeholder-content"),
-                    ],
-                ),
-                html.Div(
-                    className="card similar-games",
-                    children=[
-                        html.Div(className="card-header", children=[html.H2("Similar Games", className="card-title")]),
-                        html.Div(
-                            className="similar-games-list",
-                            children=[
-                                html.Div(className="similar-game-item", children=[
-                                    html.Div(className="similar-game-cover"),
-                                    html.Div(className="similar-game-info", children=[
-                                        html.Div("Another Great Game", className="name"),
-                                        html.Div("Indie, RPG", className="genres"),
-                                        html.Div("A short description of a similar game goes here.", className="description"),
-                                    ]),
-                                ]),
-                                html.Div(className="similar-game-item", children=[
-                                    html.Div(className="similar-game-cover"),
-                                    html.Div(className="similar-game-info", children=[
-                                        html.Div("GameQuest Saga", className="name"),
-                                        html.Div("Adventure", className="genres"),
-                                        html.Div("Another short description text for the list item.", className="description"),
-                                    ]),
-                                ]),
-                                html.Div(className="similar-game-item", children=[
-                                    html.Div(className="similar-game-cover"),
-                                    html.Div(className="similar-game-info", children=[
-                                        html.Div("Strategy Masters", className="name"),
-                                        html.Div("Strategy, Simulation", className="genres"),
-                                        html.Div("Final game description in this placeholder list.", className="description"),
-                                    ]),
-                                ]),
-                            ],
-                        ),
-                    ],
-                ),
-            ],
-        ),
-    ],
-)
+# Had to turn into function for dynamic page
+def layout_detail(game_id):
+    
+    # Logic to find the specific game details based on ID
+    
+    game_df = gs.get_game_data(game_id)
+    
+    if game_df is None or game_df.empty:
+        return html.Div(
+            className="detail-page",
+            children=[html.H1("Game not found", style={"color": "white", "text-align": "center"})]
+        )
 
+    name = game_df['Name'].iloc[0]
+    price = game_df.get('Price_Formatted', "N/A").iloc[0]
+    description = game_df.get('About the game', "No description").iloc[0]
+    # image_url = game_df.get('Header image', "").iloc[0]
+    release_date = game_df.get('Release Date', "N/A").iloc[0]
+    developer = game_df.get('Developers', "N/A").iloc[0]
+    publisher = game_df.get('Publishers', "N/A").iloc[0]
+    total_number_reviews = game_df.get('Total number of reviews', "N/A").iloc[0]
+    genres = game_df.get('Genres', "N/A").iloc[0]
+    avg_playtime = game_df.get('Average playtime forever', "N/A").iloc[0]
+
+
+
+    return html.Main(
+        className="detail-page",
+        children=[
+            # Top Section
+            html.Section(
+                className="game-summary-section",
+                children=[
+                    html.Div("Game Cover", className="game-cover"),
+                    html.Div(
+                        className="game-info",
+                        children=[
+                            # Use the dynamic title here
+                            html.H1(name), 
+                            html.P("Price: $" + str(price), className="price"),
+                            html.P("Genres: " + genres, id="genres", className="genres"),
+                            html.Div(
+                                className="description-box",
+                                children=[
+                                    html.H2("Description", className="description-title"),
+                                    html.P(str(description)) 
+                                ]
+                            ),  
+                        ],
+                    ),
+                    html.Div(
+                        className="game-stats",
+                        children=[
+                            # Display the ID dynamically
+                            html.Div(className="stat-card", children=[html.Div("App ID", className="label"), html.Div(str(game_id), className="value")]),
+                            html.Div(className="stat-card", children=[html.Div("Avg Playtime", className="label"), html.Div(str(avg_playtime) + " Minutes", className="value")]),
+                            html.Div(className="stat-card", children=[html.Div("Total Reviews", className="label"), html.Div(str(total_number_reviews), className="value")]),
+                        ],
+                    ),
+                ],
+            ),
+            # Bottom Section
+            html.Section(
+                className="bottom-section",
+                children=[
+                    html.Div(
+                        className="card",
+                        children=[
+                            html.Div(className="card-header", children=[html.H2("Info Chart", className="card-title")]),
+                            html.Div("Info Chart Placeholder", className="placeholder-content"),
+                        ],
+                    ),
+                    # ... Add the rest of your cards here ...
+                ],
+            ),
+        ],
+    )
 
 # ------------------ MAIN APP LAYOUT AND ROUTING ------------------ #
 app.layout = html.Div([
@@ -253,18 +229,55 @@ app.layout = html.Div([
 ])
 
 # This callback changes the content of 'page-content' based on the URL
+# 1. Routing Callback (Handles Home vs Detail views)
 @app.callback(Output('page-content', 'children'),
               [Input('url', 'pathname')])
 def display_page(pathname):
     if pathname == '/detail':
-        return layout_detail
-    else: # Default to home page
+        # Now this works because layout_detail is a function
+        return layout_detail("Example") 
+        
+    elif pathname and pathname.startswith('/game/'):
+        try:
+            game_id = pathname.split('/')[-1]
+            # This passes the ID to the function we just created
+            return layout_detail(game_id) 
+        except:
+            return layout_detail("Error")
+            
+    else:
         return layout_home
 
+# 2. CLICK INTERACTION CALLBACK
+# This listens to the scatter plot and updates the URL
+@app.callback(
+    Output('url', 'pathname'),
+    Input('main-scatter-plot', 'clickData')
+)
+def update_url_on_click(clickData):
+    if not clickData:
+        return dash.no_update
 
-# --------------------------- RUN THE APP --------------------------- #
+    try:
+        # 1. Get the hover text (which is now "Name___ID")
+        point = clickData['points'][0]
+        
+        # 'hovertext' is standard when using hover_name
+        full_text = point.get('hovertext', '') 
+        
+        print(f"Hover text: {full_text}")
 
+        if '___' in full_text:
+            # 2. Split the string and take the last part (the ID)
+            game_id = full_text.split('___')[-1]
+            return f"/game/{game_id}"
+        else:
+            print("Separator '___' not found in hover text")
+            return dash.no_update
 
+    except Exception as e:
+        print(f"Error parsing click data: {e}")
+        return dash.no_update
 
 if __name__ == '__main__':
     app.run(debug=True)
