@@ -120,7 +120,8 @@ layout_home = html.Main(
                 # Main chart area
                 html.Div(className="card main-chart", children=[
                     html.Div(className="actual-content", children=[
-                        dcc.Graph(figure=Fig5, id='main-scatter-plot', style={'height': '100%', 'width': '100%'})
+                        # dcc.Graph(figure=Fig5, id='main-scatter-plot', style={'height': '100%', 'width': '100%'})
+                        dcc.Graph(id='main-scatter-plot', style={'height': '100%', 'width': '100%'})
                     ]),
                 ]),
             ],
@@ -366,7 +367,19 @@ def update_url_on_click(clickData):
     except Exception as e:
         print(f"Error parsing click data: {e}")
         return dash.no_update
-    
+
+# 2.1 MAIN SCATTERPLOT FILTER CALLBACK
+@app.callback(
+    Output('main-scatter-plot', 'figure'),
+    Input('genre-select', 'value')
+)
+def update_fig_on_filter(value):
+    try:
+        return gs.get_filtered_scatterplot(value)
+    except Exception as e:
+        print(f"Error applying filter: {e}")
+        return dash.no_update
+
 # 3. SEARCH BAR CALLBACK
 @app.callback(
     Output('url', 'pathname', allow_duplicate=True),

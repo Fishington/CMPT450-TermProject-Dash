@@ -236,6 +236,35 @@ scatterplot_fig = px.scatter(
     render_mode='webgl'
 )
 
+# Main Scatterplot Filter Function
+def get_filtered_scatterplot(val_filter):
+    # Standardize input value
+    genre_filter = val_filter.capitalize()
+    
+    # Rebuild a clean dataframe
+    df_handled = df.copy()
+    df_handled['Clickable_Info'] = df_handled['Name'] + "___" + df_handled['AppID'].astype(str)
+
+    # On dropdown changes...
+    if genre_filter != 'All': 
+        # filter for only selected genre
+        df_handled = df_handled[df_handled['Genres'].str.contains(genre_filter, case=False)]
+
+    # Rebuild scatterplot
+    scatterplot_fig = px.scatter(
+        df_handled,
+        x='Average playtime forever',
+        y='Positive Review %',
+        hover_name='Clickable_Info',
+        title='Average Playtime vs Positive Review % (Click a point)',
+        size_max=60,
+        # custom_data=['AppID'],
+        hover_data={'AppID': True},
+        render_mode='webgl'
+    )
+
+    return scatterplot_fig
+
 # Detail Page Function
 def get_game_data(game_id):
     """
