@@ -39,7 +39,7 @@ layout_home = html.Main(
                 html.Div(className="card", children=[
                     html.Div(className="card-header", children=[
                         html.H2("Game Releases Over Time", className="card-title"),
-                        html.P("(line chart)", className="card-subtitle"),
+                        #html.P("(line chart)", className="card-subtitle"),
                     ]),
                     html.Div(className="actual-content", children=[
                         dcc.Graph(figure=Fig1, responsive=True)
@@ -48,8 +48,8 @@ layout_home = html.Main(
                 ]),
                 html.Div(className="card", children=[
                     html.Div(className="card-header", children=[
-                        html.H2("Active Players Per Genre", className="card-title"),
-                        html.P("(bar chart)", className="card-subtitle"),
+                        html.H2("Players Per Genre", className="card-title"),
+                        #html.P("(bar chart)", className="card-subtitle"),
                     ]),
                     html.Div(className="actual-content", children=[
                         dcc.Graph(figure=Fig2, responsive=True)
@@ -59,7 +59,7 @@ layout_home = html.Main(
                 html.Div(className="card", children=[
                     html.Div(className="card-header", children=[
                         html.H2("Genre Explore", className="card-title"),
-                        html.P("(bubble chart)", className="card-subtitle"),
+                        #html.P("(bubble chart)", className="card-subtitle"),
                     ]),
                     html.Div(className="actual-content", children=[
                         dcc.Graph(figure=Fig3, responsive=True)
@@ -69,7 +69,7 @@ layout_home = html.Main(
                 html.Div(className="card", children=[
                     html.Div(className="card-header", children=[
                         html.H2("Top Performing Tags", className="card-title"),
-                        html.P("(word cloud)", className="card-subtitle"),
+                        #html.P("(word cloud)", className="card-subtitle"),
                     ]),
                     html.Div(className="actual-content", children=[
                         dcc.Graph(figure=Fig4, responsive=True)
@@ -173,7 +173,8 @@ def layout_detail(game_id):
         "width": "95%", 
         "height": "190px", # Standard steam widget height
         "overflow": "hidden",
-        "margin-top": "20px"
+        "margin-top": "20px",
+        "margin-left": "16px"
         }
     )
 
@@ -247,7 +248,7 @@ def layout_detail(game_id):
                     html.Div(
                         className="card",
                         children=[
-                            html.Div(className="card-header", children=[html.H2("Info Chart", className="card-title")]),
+                            html.Div(className="card-header", children=[html.H2("Popularity and Features Rating", className="card-title")]),
                             html.Div(className="actual-content", children=[radar_chart_content]),
                             #html.Div("Info Chart Placeholder", className="placeholder-content"),
                         ],
@@ -262,7 +263,7 @@ def layout_detail(game_id):
                     html.Div(
                         className="card",
                         children=[
-                            html.Div(className="card-header", children=[html.H2("Recommendation Section", className="card-title")]),
+                            html.Div(className="card-header", children=[html.H2("Similar Games", className="card-title")]),
                             html.Div(className="actual-content", children=[recommendation_section])
                         ],
                     ),
