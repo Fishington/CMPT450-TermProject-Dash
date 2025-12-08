@@ -262,6 +262,10 @@ def get_filtered_scatterplot(val_filter):
         hover_data={'AppID': True},
         render_mode='webgl'
     )
+    
+    scatterplot_fig.update_layout(
+        title_x=0.03
+    )
 
     return scatterplot_fig
 

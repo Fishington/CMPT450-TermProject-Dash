@@ -606,8 +606,8 @@ input[type="range"]::-webkit-slider-thumb {
 
 .rec-container {
     display: flex;
-    gap: 20px;
-    margin-top: 10px;
+    gap: 10px;
+    margin: 20px 16px;
 }
 .rec-card {
     flex: 1;
