@@ -150,7 +150,6 @@ layout_home = html.Main(
                             )
                         ]),
                     ]),
-
                 ]),
                 # Main chart area
                 html.Div(className="card main-chart", children=[

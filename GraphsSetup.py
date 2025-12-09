@@ -263,6 +263,7 @@ def get_filtered_scatterplot(genre_val, price_range, year_range, review_range):
         min_y, max_y = year_range
         filtered_df = filtered_df[(filtered_df['Year released'] >= min_y) & (filtered_df['Year released'] <= max_y)]
         
+        
     # 5. Filter by REVIEWS (New)
     if review_range:
         min_r, max_r = review_range
