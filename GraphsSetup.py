@@ -237,34 +237,57 @@ scatterplot_fig = px.scatter(
 )
 
 # Main Scatterplot Filter Function
-def get_filtered_scatterplot(val_filter):
-    # Standardize input value
-    genre_filter = val_filter.capitalize()
-    
-    # Rebuild a clean dataframe
-    df_handled = df.copy()
-    df_handled['Clickable_Info'] = df_handled['Name'] + "___" + df_handled['AppID'].astype(str)
+def get_filtered_scatterplot(genre_val, price_range, year_range, review_range):
+    """
+    Filters the scatterplot based on Genre, Price, Year, and Review Count.
+    """
+    # 1. Start clean
+    filtered_df = df_handled.copy() 
+    filtered_df['Clickable_Info'] = filtered_df['Name'] + "___" + filtered_df['AppID'].astype(str)
 
-    # On dropdown changes...
-    if genre_filter != 'All': 
-        # filter for only selected genre
-        df_handled = df_handled[df_handled['Genres'].str.contains(genre_filter, case=False)]
+    # 2. Filter by GENRE
+    if genre_val and genre_val != 'all':
+        filtered_df = filtered_df[filtered_df['Genres'].str.contains(genre_val.capitalize(), case=False, na=False)]
 
-    # Rebuild scatterplot
+    # 3. Filter by PRICE
+    if price_range:
+        min_p, max_p = price_range
+        # If max is 100, treat as "100+" (unbounded)
+        if max_p == 100:
+            filtered_df = filtered_df[filtered_df['Price'] >= min_p]
+        else:
+            filtered_df = filtered_df[(filtered_df['Price'] >= min_p) & (filtered_df['Price'] <= max_p)]
+
+    # 4. Filter by YEAR
+    if year_range:
+        min_y, max_y = year_range
+        filtered_df = filtered_df[(filtered_df['Year released'] >= min_y) & (filtered_df['Year released'] <= max_y)]
+        
+    # 5. Filter by REVIEWS (New)
+    if review_range:
+        min_r, max_r = review_range
+        # If max is 10000, treat as "10000+" (unbounded max)
+        if max_r == 10000:
+            filtered_df = filtered_df[filtered_df['total_reviews'] >= min_r]
+        else:
+            filtered_df = filtered_df[(filtered_df['total_reviews'] >= min_r) & (filtered_df['total_reviews'] <= max_r)]
+
+    # 6. Build Figure
     scatterplot_fig = px.scatter(
-        df_handled,
+        filtered_df,
         x='Average playtime forever',
         y='Positive Review %',
         hover_name='Clickable_Info',
-        title='Average Playtime vs Positive Review % (Click a point)',
+        title=f'Playtime vs Reviews ({len(filtered_df)} games)',
         size_max=60,
-        # custom_data=['AppID'],
         hover_data={'AppID': True},
         render_mode='webgl'
     )
     
     scatterplot_fig.update_layout(
-        title_x=0.03
+        title_x=0.03,
+        xaxis_title="Average Playtime (Minutes)",
+        yaxis_title="Positive Review %"
     )
 
     return scatterplot_fig

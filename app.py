@@ -103,19 +103,54 @@ layout_home = html.Main(
                             )
                         ]),
                     ]),
-                    # Crazy way of doing this, but gemini kept doing this so whatever atm
-                    # html.Div(className="filter-group", children=[
-                    #     html.Label("Price Range", htmlFor="price-range"),
-                    #     html.Div(className="range-slider-wrapper", children=[
-                    #         dcc.RangeSlider(id='price-range', min=0, max=100, step=1, value=[50])
-                    #     ]),
-                    # ]),
-                    # html.Div(className="filter-group", children=[
-                    #     html.Label("Release Date", htmlFor="release-date"),
-                    #     html.Div(className="range-slider-wrapper", children=[
-                    #         dcc.RangeSlider(id='release-date', min=2000, max=2024, step=1, value=[2018])
-                    #     ]),
-                    # ]),
+                    
+                    # 2. PRICE SLIDER (New)
+                    html.Div(className="filter-group", children=[
+                        html.Label("Price Range ($)", htmlFor="price-select"),
+                        html.Div(className="range-slider-wrapper", children=[
+                            dcc.RangeSlider(
+                                id='price-select', 
+                                min=0, 
+                                max=100, 
+                                step=5, 
+                                value=[0, 100], # Default: $0 to $100
+                                marks={0: 'Free', 50: '$50', 100: '$100+'},
+                                tooltip={"placement": "bottom", "always_visible": True}
+                            )
+                        ]),
+                    ]),
+
+                    # 3. YEAR SLIDER (New)
+                    html.Div(className="filter-group", children=[
+                        html.Label("Release Year", htmlFor="year-select"),
+                        html.Div(className="range-slider-wrapper", children=[
+                            dcc.RangeSlider(
+                                id='year-select', 
+                                min=2005, # Adjust based on your data 
+                                max=2025, 
+                                step=1, 
+                                value=[2015, 2025], # Default range
+                                marks={2005: '2005', 2010: '2010', 2015: '2015', 2020: '2020', 2025: '2025'},
+                                tooltip={"placement": "bottom", "always_visible": True}
+                            )
+                        ]),
+                    ]),
+
+                    html.Div(className="filter-group", children=[
+                        html.Label("Total Reviews", htmlFor="review-select"),
+                        html.Div(className="range-slider-wrapper", children=[
+                            dcc.RangeSlider(
+                                id='review-select', 
+                                min=0, 
+                                max=10000, 
+                                step=100, 
+                                value=[0, 10000], # Default: Show everything
+                                marks={0: '0', 2500: '2.5k', 5000: '5k', 7500: '7.5k', 10000: '10k+'},
+                                tooltip={"placement": "bottom", "always_visible": True}
+                            )
+                        ]),
+                    ]),
+
                 ]),
                 # Main chart area
                 html.Div(className="card main-chart", children=[
@@ -372,13 +407,21 @@ def update_url_on_click(clickData):
 # 2.1 MAIN SCATTERPLOT FILTER CALLBACK
 @app.callback(
     Output('main-scatter-plot', 'figure'),
-    Input('genre-select', 'value')
+    [
+        Input('genre-select', 'value'),
+        Input('price-select', 'value'),
+        Input('year-select', 'value'),
+        Input('review-select', 'value') # <--- New Input
+    ]
 )
-def update_fig_on_filter(value):
+def update_fig_on_filter(genre, price, year, reviews):
+    if not genre: return dash.no_update
+        
     try:
-        return gs.get_filtered_scatterplot(value)
+        # Pass all 4 values now
+        return gs.get_filtered_scatterplot(genre, price, year, reviews)
     except Exception as e:
-        print(f"Error applying filter: {e}")
+        print(f"Error applying filters: {e}")
         return dash.no_update
 
 # 3. SEARCH BAR CALLBACK
